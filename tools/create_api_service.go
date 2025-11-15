@@ -97,6 +97,11 @@ func CreateAPIService(ctx context.Context, req *mcp.CallToolRequest, params Crea
 		return responses.FormatError(fmt.Sprintf("failed to update config file: %v", err))
 	}
 
+	// Validate no style conflicts
+	if err := fixer.ValidateNoStyleConflicts(serviceDir); err != nil {
+		return responses.FormatError(fmt.Sprintf("style conflicts detected: %v", err))
+	}
+
 	// Verify build
 	if err := fixer.VerifyBuild(serviceDir); err != nil {
 		return responses.FormatError(fmt.Sprintf("failed to verify build: %v", err))

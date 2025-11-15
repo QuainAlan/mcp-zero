@@ -55,13 +55,19 @@ func GenerateAPIFromSpec(ctx context.Context, req *mcp.CallToolRequest, params G
 		return responses.FormatValidationError("output_dir", outputDir, err.Error(), "Provide an absolute path to an existing writable directory")
 	}
 
-	// T043: Set code style (default: go_zero)
+	// T043: Set code style (default: detect existing or use go_zero)
 	style := params.Style
 	if style == "" {
-		style = "go_zero"
+		// Try to detect existing style to avoid conflicts
+		style = fixer.SuggestStyleBasedOnExisting(outputDir, "go_zero")
 	}
 	if style != "go_zero" && style != "gozero" {
 		return responses.FormatValidationError("style", style, "invalid style", "Use 'go_zero' or 'gozero'")
+	}
+
+	// Clean up any existing style conflicts before generating
+	if err := fixer.CleanupStyleConflicts(outputDir, style); err != nil {
+		return responses.FormatError(fmt.Sprintf("failed to cleanup style conflicts: %v", err))
 	}
 
 	// T044: Execute goctl api go command
@@ -97,6 +103,11 @@ func GenerateAPIFromSpec(ctx context.Context, req *mcp.CallToolRequest, params G
 
 	if err := fixer.TidyGoModule(outputDir); err != nil {
 		return responses.FormatError(fmt.Sprintf("failed to tidy Go module: %v", err))
+	}
+
+	// Validate no style conflicts after generation
+	if err := fixer.ValidateNoStyleConflicts(outputDir); err != nil {
+		return responses.FormatError(fmt.Sprintf("style conflicts detected after generation: %v", err))
 	}
 
 	// T046: Verify build success
