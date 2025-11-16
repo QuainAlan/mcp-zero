@@ -73,7 +73,7 @@ Quit and restart Claude Desktop to load the new MCP server.
 
 Open Claude Desktop and try:
 
-```
+```text
 Create a new API service called "userservice" on port 8080
 ```
 
@@ -87,7 +87,7 @@ Claude will use mcp-zero to:
 
 Example response:
 
-```
+```text
 Successfully created api service 'userservice'
 
 Output directory: /your/current/directory/userservice
@@ -102,6 +102,49 @@ Next steps:
   3. go run .
 ```
 
+### Understanding the Generated Structure
+
+The generated service includes:
+- `userservice.api` - API specification file
+- `etc/userservice.yaml` - Configuration file
+- `internal/handler/` - HTTP handlers
+- `internal/logic/` - Business logic
+- `internal/svc/servicecontext.go` - Service context
+- `userservice.go` - Main entry point
+
+### Adding Your First Endpoint
+
+Before running the service, you need to define your API endpoints. Edit the `userservice.api` file:
+
+```go
+syntax = "v1"
+
+info (
+    title: "userservice"
+    desc: "userservice API"
+    author: "your name"
+    email: "your@email.com"
+)
+
+type (
+    PingRequest {}
+    PingResponse {
+        Message string `json:"message"`
+    }
+)
+
+service userservice-api {
+    @handler PingHandler
+    get /ping (PingRequest) returns (PingResponse)
+}
+```
+
+Then regenerate the code:
+
+```text
+Generate code from the userservice.api file in ./userservice
+```
+
 ### Running the Service
 
 ```bash
@@ -109,35 +152,46 @@ cd userservice
 go run userservice.go
 ```
 
-Test it:
+Now test it:
 
 ```bash
 curl http://localhost:8080/ping
 # Response: {"message":"pong"}
 ```
 
-### Adding an Endpoint
+You'll need to implement the logic in `internal/logic/pinglogic.go`:
 
-To add new endpoints, you'll need to:
-
-1. Edit the `.api` file manually to add your endpoint
-2. Regenerate code from the updated spec:
-
+```go
+func (l *PingLogic) Ping(req *types.PingRequest) (resp *types.PingResponse, err error) {
+    return &types.PingResponse{
+        Message: "pong",
+    }, nil
+}
 ```
-Generate code from the userservice.api file in ./userservice
-```
 
-Claude will use the `generate_api_from_spec` tool to regenerate the service with your new endpoints.
+### Adding More Endpoints
+
+To add another endpoint, just add it to the `.api` file and regenerate:
+
+```go
+service userservice-api {
+    @handler PingHandler
+    get /ping (PingRequest) returns (PingResponse)
+
+    @handler UserInfoHandler
+    get /user/:id (UserInfoRequest) returns (UserInfoResponse)
+}
+```
 
 ### Creating an RPC Service
 
-```
+```text
 Create an RPC service called "authservice" with methods Login and Verify
 ```
 
 ### Analyzing a Project
 
-```
+```text
 Analyze the project in /path/to/my/go-zero/project
 ```
 
@@ -150,13 +204,13 @@ You'll get:
 
 ### Generating Database Models
 
-```
+```text
 Generate models for the users table in mysql://user:pass@localhost:3306/mydb
 ```
 
 ### Creating Middleware
 
-```
+```text
 Generate authentication middleware for JWT tokens
 ```
 
@@ -164,7 +218,7 @@ Generate authentication middleware for JWT tokens
 
 ### 1. Starting a New Microservice Project
 
-```
+```text
 Create these services in ./services directory:
 - API gateway on port 8080
 - User service RPC on port 9001
@@ -173,7 +227,7 @@ Create these services in ./services directory:
 
 ### 2. Spec-First Development
 
-```
+```text
 Create an API spec for a user service with these endpoints:
 - POST /login
 - POST /register
@@ -183,25 +237,25 @@ Create an API spec for a user service with these endpoints:
 
 Then generate code:
 
-```
+```text
 Generate code from userservice.api
 ```
 
 ### 3. Adding Features to Existing Service
 
-```
+```text
 I have a service at ./userservice. Add rate limiting middleware.
 ```
 
 ### 4. Configuration Management
 
-```
+```text
 Generate a production configuration template for my API service
 ```
 
 ### 5. Migration from Another Framework
 
-```
+```text
 How do I migrate my Express.js API to go-zero?
 ```
 
@@ -222,7 +276,7 @@ How do I migrate my Express.js API to go-zero?
 
 For monorepo:
 
-```
+```text
 myproject/
 ├── services/
 │   ├── api-gateway/
@@ -234,7 +288,7 @@ myproject/
 
 Ask Claude:
 
-```
+```text
 Create services in ./services directory
 ```
 
@@ -242,7 +296,7 @@ Create services in ./services directory
 
 If generation fails:
 
-```
+```text
 The service generation failed. Try again with corrected parameters.
 ```
 
@@ -250,15 +304,15 @@ mcp-zero preserves partial state, so you won't lose progress.
 
 ### Getting Help
 
-```
+```text
 Explain go-zero middleware
 ```
 
-```
+```text
 What's the difference between API and RPC services in go-zero?
 ```
 
-```
+```text
 Show me best practices for error handling in go-zero
 ```
 
@@ -308,27 +362,27 @@ Show me best practices for error handling in go-zero
 
 ### Custom Templates
 
-```
+```text
 Use this middleware template for my service:
 [paste your template]
 ```
 
 ### Batch Operations
 
-```
+```text
 Create 5 microservices: user, order, product, payment, notification
 All RPC services, ports starting from 9001
 ```
 
 ### Configuration Validation
 
-```
+```text
 Validate my configuration file at ./etc/config.yaml
 ```
 
 ### Project Documentation
 
-```
+```text
 Generate documentation for my project structure
 ```
 
