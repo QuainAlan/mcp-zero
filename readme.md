@@ -4,7 +4,7 @@ A Model Context Protocol (MCP) tool that helps developers quickly scaffold and g
 
 ## Quick Start
 
-**New to mcp-zero?** Check out our [Quick Start Guide](quickstart.md) for a step-by-step tutorial on getting started!
+**New to mcp-zero?** Check out our [Quick Start Guide](QUICKSTART.md) for a step-by-step tutorial on getting started!
 
 The quickstart covers:
 
